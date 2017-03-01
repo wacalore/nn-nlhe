@@ -7,10 +7,8 @@ def flatten(iter):
     return list(itertools.chain.from_iterable(iter))
 
 cards = '23456789TJQKA'
-deck = [i + 'H' for i in cards]
-deck.extend([i + 'D' for i in cards])
-deck.extend([i + "S" for i in cards])
-deck.extend([i + "C" for i in cards])
+suits = 'AHDC'
+deck = [x+y for x in cards for y in suits]
 
 
 def gen_deck(hero_hand):
