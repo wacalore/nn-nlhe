@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as mp
 import itertools
-from evalhand import evalhand
-
+from evalhand import eval_hand
 
 def flatten(iter):
     return list(itertools.chain.from_iterable(iter))
@@ -45,7 +44,7 @@ def simulate_hand(hero_hand, villains, sims):
         hero_board_hand.append(river)
         hero_board_hand = ' '.join(hero_board_hand)
 
-        hero_score = evalhand(hero_board_hand)
+        hero_score = eval_hand(hero_board_hand)
 
         results = range(villains)
         for l in range(villains):
@@ -53,7 +52,7 @@ def simulate_hand(hero_hand, villains, sims):
             villain_hand.append(turn)
             villain_hand.append(river)
             villain_hand = ' '.join(villain_hand)
-            results[l] = evalhand(villain_hand)
+            results[l] = eval_hand(villain_hand)
 
         output.append(1 if hero_score > max(results) else 0)
         results.append(hero_score)
