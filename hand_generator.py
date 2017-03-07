@@ -1,13 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as mp
 import itertools
+import json
+from pprint import pprint
 from evalhand import eval_hand
+from deck import Deck
 
 def flatten(iter):
     return list(itertools.chain.from_iterable(iter))
 
 cards = '23456789TJQKA'
-suits = 'AHDC'
+suits = 'SHDC'
 deck = [x+y for x in cards for y in suits]
 
 
@@ -21,7 +24,10 @@ def gen_deck(hero_hand):
 
 def simulate_hand(hero_hand, villains, sims):
 
-    remaining_deck = gen_deck(hero_hand)
+    full_deck = Deck()
+    full_deck.gen_deck(hero_hand)
+
+    remaining_deck = full_deck.my_deck
     hero_hand = hero_hand.split()
     output = []
     rankings = []
@@ -60,9 +66,23 @@ def simulate_hand(hero_hand, villains, sims):
 
 if __name__ == "__main__":
 
-    hand = "JC TC"
-    output, rankings = simulate_hand(hand, 4, 10000)
-    print np.mean(output)
-    print np.mean(rankings)
-    mp.hist(rankings)
-    mp.show()
+    with open('hand_win_prob_and_ranks.json') as data_file:
+        data = json.load(data_file)
+
+    key = map(str, data.keys())
+    print(key[0:5])
+    test = []
+
+    for x in key:
+        test.append((x, data[x]['win_prob']))
+
+    print(sorted(test, key=lambda tup: tup[1]))
+
+
+           # hand = "JC TC"
+           # output, rankings = simulate_hand(hand, 4, 10000)
+           # print np.mean(output)
+           # print np.mean(rankings)
+           # mp.hist(rankings)
+           # mp.show()
+           #

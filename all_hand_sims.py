@@ -3,7 +3,7 @@ from hand_generator import simulate_hand
 from numpy import mean
 
 cards = '23456789TJQKA'
-suits = 'AHDC'
+suits = 'SHDC'
 deck = [x+y for x in cards for y in suits]
 
 # generate a json file containing results from simulation on all cards
@@ -19,7 +19,7 @@ output_dict = {}
 with open('hand_win_prob_and_ranks.json', 'w') as json_out:
 	for hand in all_poss_hands:
 		print all_poss_hands.index(hand)
-		output, rankings = simulate_hand(' '.join(hand), villains=4, sims=1000)
+		output, rankings = simulate_hand(' '.join(hand), villains=4, sims=10000)
 		output_dict[' '.join(hand)] = {
 			'win_prob': mean(output),
 			'rankings': mean(rankings)
