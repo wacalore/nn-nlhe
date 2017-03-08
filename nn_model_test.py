@@ -1,5 +1,6 @@
 import string
 import random
+from evalhand import eval_hand
 
 cards = '23456789TJQKA'
 suits = 'SHDC'
@@ -37,8 +38,25 @@ class NLHEHand(object):
 			[[next(deck_iter), next(deck_iter)] for player in self.players]
 		))
 		self.flop = [next(deck_iter), next(deck_iter), next(deck_iter)]
-		self.turn = next(deck_iter)
-		self.river = next(deck_iter)
+		self.turn = [next(deck_iter)]
+		self.river = [next(deck_iter)]
+
+		self.hands_with_community_cards = dict(zip(
+			[player.nn_id for player in self.players],
+			[self.player_cards[player.nn_id] + self.flop + self.turn + self.river for player in self.players]))
+
+	def score_hands(self):
+		"""
+		Use eval_hand to return winner ID (assume all players finish)
+		:return: nn_id
+		"""
+		self.results = dict(zip(
+			self.hands_with_community_cards.keys(),
+			[eval_hand(" ".join(p_hand)) for p_hand in self.hands_with_community_cards.values()]
+		))
+		return self.results
+
+
 
 def test_player_hand_classes():
 	players = [SimulatedPlayer() for k in range(7)]
