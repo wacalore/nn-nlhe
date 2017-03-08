@@ -21,5 +21,5 @@ class Deck:
         self.my_deck = remaining_deck
 
     def slice_deck(self, rank, suits='SHDC'):
-        slice = [r+s for r, s in self.my_deck if r in rank and s in suits]
-        return slice
+        deck_slice = [r+s for r, s in self.my_deck if r in rank and s in suits]
+        return deck_slice

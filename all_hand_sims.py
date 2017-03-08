@@ -19,7 +19,7 @@ output_dict = {}
 with open('hand_win_prob_and_ranks.json', 'w') as json_out:
 	for hand in all_poss_hands:
 		print all_poss_hands.index(hand)
-		output, rankings = simulate_hand(' '.join(hand), villains=4, sims=1000)
+		output, rankings = simulate_hand(' '.join(hand), villains=4, sims=10000)
 		output_dict[' '.join(hand)] = {
 			'win_prob': mean(output),
 			'rankings': mean(rankings)

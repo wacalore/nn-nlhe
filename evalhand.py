@@ -3,8 +3,8 @@ import pandas as pd
 rankvalues = dict((r, i)
                   for i, r in enumerate('..23456789TJQKA'))
 
-def eval_hand(hand):
 
+def eval_hand(hand):
 
     hand = hand.split()
 
