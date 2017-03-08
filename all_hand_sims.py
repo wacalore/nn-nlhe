@@ -3,7 +3,7 @@ from hand_generator import simulate_hand
 from numpy import mean
 
 cards = '23456789TJQKA'
-suits = 'AHDC'
+suits = 'SHDC'
 deck = [x+y for x in cards for y in suits]
 
 # generate a json file containing results from simulation on all cards

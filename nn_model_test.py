@@ -2,7 +2,7 @@ import string
 import random
 
 cards = '23456789TJQKA'
-suits = 'AHDC'
+suits = 'SHDC'
 full_deck = [x + y for x in cards for y in suits]
 
 class SimulatedPlayer(object):

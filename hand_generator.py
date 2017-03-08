@@ -7,7 +7,7 @@ def flatten(iter):
     return list(itertools.chain.from_iterable(iter))
 
 cards = '23456789TJQKA'
-suits = 'AHDC'
+suits = 'SHDC'
 deck = [x+y for x in cards for y in suits]
 
 
