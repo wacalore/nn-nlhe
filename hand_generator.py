@@ -22,10 +22,11 @@ def gen_deck(hero_hand):
     return remaining_deck
 
 
-def simulate_hand(hero_hand, villains, sims):
+def simulate_hand(hero_hand, villains, sims, villain_range = None):
 
     full_deck = Deck()
     full_deck.gen_deck(hero_hand)
+
 
     remaining_deck = full_deck.my_deck
     hero_hand = hero_hand.split()
@@ -66,7 +67,7 @@ def simulate_hand(hero_hand, villains, sims):
 
 if __name__ == "__main__":
 
-    with open('hand_win_prob_and_ranks.json') as data_file:
+    with open('hand_win_prob_and_ranks_1villain.json') as data_file:
         data = json.load(data_file)
 
     key = map(str, data.keys())
