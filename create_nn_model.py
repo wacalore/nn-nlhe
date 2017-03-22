@@ -19,7 +19,7 @@
 
 import tensorflow as tf
 
-from nn_model_test import SimulatedPlayer, NLHEHand
+from nlhemodel import SimulatedPlayer, NLHEHand
 
 # simple start - two players heads up.
 

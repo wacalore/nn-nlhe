@@ -6,6 +6,7 @@ from __future__ import print_function
 import os
 import neat
 import visualize
+import nlhemodel as model
 
 # 2-input XOR inputs and expected outputs.
 xor_inputs = [(0.0, 0.0), (0.0, 1.0), (1.0, 0.0), (1.0, 1.0)]
@@ -19,6 +20,17 @@ def eval_genomes(genomes, config):
         for xi, xo in zip(xor_inputs, xor_outputs):
             output = net.activate(xi)
             genome.fitness -= (output[0] - xo[0]) ** 2
+
+
+def eval_nlhe_genomes(genomes, config):
+	for genome_id, genome in genomes:
+		genome.fitness = 0.0
+		net = neat.nn.FeedForwardNetwork.create(genome, config)
+
+		for game in range(100):
+			genome_player = model.SimulatedPlayer(chips=1000)
+			default_player = model.SimulatedPlayer(chips=1000)
+
 
 
 def run(config_file):
