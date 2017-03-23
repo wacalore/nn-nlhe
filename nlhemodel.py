@@ -23,10 +23,11 @@ DECK_DICT = dict((r, i)
 
 class SimulatedPlayer(object):
 
-	def __init__(self, strategy=None, chips=None, nn_id=None):
-		self.chips = 0  # some int here
+	def __init__(self, strategy=None, chips=0.0, nn_id=None):
+		self.chips = chips  # some int here
 		self.action_sequence = np.zeros(16)
 		self.strategy = strategy
+		self.nn_id = nn_id
 
 		if not nn_id:
 			# pass in NN model to associate with player
@@ -43,7 +44,7 @@ class SimulatedPlayer(object):
 
 class NLHEHand(object):
 
-	IDs = []
+	IDs = {}
 
 	def __init__(self, list_of_players, blind):
 		self.players = list_of_players  # type(list) from SimulatedPlayer class
@@ -81,8 +82,7 @@ class NLHEHand(object):
 			[self.player_cards[player.nn_id] + self.flop + self.turn + self.river for player in self.players]))
 
 	def get_ids(self):
-		for player in self.players:
-			self.IDs.append(player.nn_id)
+		self.IDs = dict((player.nn_id, player) for player in self.players)
 
 	def score_hands(self):
 		"""
@@ -96,7 +96,6 @@ class NLHEHand(object):
 		return self.results
 
 
-
 class HeadsUpRiverAction(NLHEHand):
 
 	def __init__(self, list_of_players, blinds):
@@ -104,11 +103,12 @@ class HeadsUpRiverAction(NLHEHand):
 		assert len(list_of_players) == 2
 
 		self.pot = 2*blinds
+		[player.update_chips(-1.0*blinds) for player in self.players]
 		self.get_ids()
 
-	def hand_to_input(self, player1, player2):
+	def hand_to_input(self, player1, player2, previous_action, bet_to_call):
 		cards_to_num = [DECK_DICT[x] for x in self.hands[player1.nn_id]]
-		player1.action_sequence = [self.pot, player1.chips, player2.chips]
+		player1.action_sequence = [self.pot, player1.chips, player2.chips, previous_action, bet_to_call]
 		player1.action_sequence.append(cards_to_num)
 
 	def execute(self):
@@ -116,13 +116,76 @@ class HeadsUpRiverAction(NLHEHand):
 		self.deal_turn()
 		self.deal_river()
 
+		# Determine which player is next to act
 		player_cycle = itertools.cycle(self.players)
 		player_to_act = next(player_cycle)
+		previous_action = 0.0
+		bet_to_call = 0.0
 
+		# Betting action logic
 		while True:
 			next_player = next(player_cycle)
-			self.hand_to_input(player_to_act, next_player)
+			self.hand_to_input(player_to_act, next_player, previous_action, bet_to_call)
 
+			action = player_to_act.strategy(player_to_act.action_sequence)
+			raise_action = action[0]
+			bet_size = action[1]
+
+			rounded = round(raise_action)
+			if rounded == 1:
+				#Fold
+				break
+
+			if rounded == 2:
+				#Check
+				previous_action = 2
+
+			if rounded == 3:
+				#Call
+				if previous_action == 4:
+					if player_to_act.chips > bet_to_call:
+						self.pot += bet_to_call
+						player_to_act.chips -= bet_to_call
+						break
+					else:
+						self.pot += player_to_act.chips
+						player_to_act.chips = 0.0
+						break
+				elif previous_action == 2:
+					break
+				else:
+					previous_action = 2
+					continue
+
+			if rounded == 4:
+				print(self.pot)
+				#Raise/bet
+				bet_size = min(player_to_act.chips, bet_size)
+				if bet_size > bet_to_call:
+					bet_to_call = bet_size - bet_to_call
+					self.pot += bet_size
+					player_to_act.chips -= bet_size
+					previous_action = 4
+					continue
+				else:
+					previous_action = 1
+					break
+
+			player_to_act = next_player
+
+		#end while
+		if previous_action == 1:
+			next_player.update_chips(self.pot)
+
+		else:
+			results = self.score_hands()
+			winner = max(results, key=results.get)
+			winning_player = self.IDs[winner]
+			winning_player.update_chips(self.pot)
+
+
+def teststrat(input):
+	return [4.0,100.0]
 
 
 def test_player_hand_classes():
@@ -131,3 +194,11 @@ def test_player_hand_classes():
 	# create a hand
 	hand = NLHEHand(list_of_players=players)
 
+if __name__ == "__main__":
+	sim1 = SimulatedPlayer(strategy=teststrat,chips=1000, nn_id=1)
+	sim2 = SimulatedPlayer(strategy=teststrat,chips=1000, nn_id=2)
+	testhand = HeadsUpRiverAction([sim1,sim2], 2.0)
+
+	testhand.execute()
+	print(sim1.chips)
+	print(sim2.chips)
